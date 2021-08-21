@@ -25,6 +25,7 @@ public class GodotCameraView extends CameraPreview {
     private static final String PARAMETER_FLASH_MODE = "param_flash_mode";
 //    private static final String PARAMETER_ENABLE_SHUTTER_SOUND = "param_enable_shutter_sound";
     private static final String PARAMETER_PITCH_TO_ZOOM = "param_pitch_to_zoom";
+    private static final String PARAMETER_BACKGROUND_PREVIEW = "param_background_preview";
     private static final String PARAMETER_FACE_RECOGNITION = "param_face_recognition";
     private static final String PARAMETER_FACE_RECOGNITION_BOUND_COLOR = "param_face_recognition_bound_color";
     private static final String PARAMETER_FACE_RECOGNITION_BOUND_SHAPE = "param_face_recognition_bound_shape";
@@ -134,6 +135,9 @@ public class GodotCameraView extends CameraPreview {
             case PARAMETER_PITCH_TO_ZOOM:
                 setPinchToZoomMode(value);
                 break;
+            case PARAMETER_BACKGROUND_PREVIEW:
+                setBackgroundPreview(value);
+                break;
             case PARAMETER_COLOR_EFFECT:
                 setColorEffect(value);
                 break;
@@ -190,6 +194,11 @@ public class GodotCameraView extends CameraPreview {
     private void setPinchToZoomMode(Object pinchToZoomMode) {
         if (pinchToZoomMode instanceof Boolean)
             setPinchToZoomMode((boolean)pinchToZoomMode);
+    }
+
+    private void setBackgroundPreview(Object backgroundPreview) {
+        if (backgroundPreview instanceof Boolean)
+            setBackgroundPreview((boolean)backgroundPreview);
     }
 
     private static final int PARAMETER_VALUE_FLASH_MODE_OFF = 0;

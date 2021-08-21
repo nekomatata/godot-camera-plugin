@@ -16,6 +16,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.graphics.Point;
@@ -31,6 +32,7 @@ public abstract class CameraPreview extends FrameLayout implements TextureView.S
     private int mDeviceRotation = -1;
     private Display mDeviceDisplay;
     private boolean mIsCameraPreviewing = false;
+    private boolean mBackgroundPreview = false;
     private CameraPreviewFaceDetection mCameraPreviewFaceDetection;
     private CameraPreviewZoomGesture mCameraZoomGesture;
 
@@ -81,6 +83,26 @@ public abstract class CameraPreview extends FrameLayout implements TextureView.S
                     return true;
             }
         });
+    }
+
+	/*@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		boolean consumed = super.onTouchEvent(event);
+		if (isActive()) {
+			return mCameraZoomGesture.onTouchEvent(event);
+		} else {
+			return true;
+		}
+	}*/
+		
+    public void initializeLayout() {
+		if (mBackgroundPreview) {
+			setBackgroundPreview(mBackgroundPreview);
+		}
+	}
+
+    public Camera getCamera() {
+        return mCamera;
     }
 
     public Camera.CameraInfo getCameraInfo() {
@@ -298,6 +320,29 @@ public abstract class CameraPreview extends FrameLayout implements TextureView.S
 
     protected final void setPinchToZoomMode(boolean active) {
         mCameraZoomGesture.setActive(active);
+    }
+
+    protected final void setBackgroundPreview(boolean active) {
+		mBackgroundPreview = active;
+		
+        if (!isActive()) return;
+		
+		ViewGroup layoutGroup = (ViewGroup)getParent();
+		if (layoutGroup == null) {
+			return;
+		}
+		
+		ViewGroup layoutParentGroup = (ViewGroup)layoutGroup.getParent();
+		if (layoutParentGroup == null) {
+			return;
+		}
+		
+		layoutParentGroup.removeView(layoutGroup);
+		if (active) {
+			layoutParentGroup.addView(layoutGroup, 0);
+		} else {
+			layoutParentGroup.addView(layoutGroup);
+		}
     }
 
     protected final void setFaceRecognitionMode(boolean active) {

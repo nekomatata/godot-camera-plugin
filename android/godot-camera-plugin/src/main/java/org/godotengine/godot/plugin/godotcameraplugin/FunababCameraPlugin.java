@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-public class FunababCameraPlugin extends GodotPlugin {
+public class FunababCameraPlugin extends GodotPlugin implements Camera.PreviewCallback {
 
     private Godot mGodot;
     private Context mContext;
@@ -45,6 +45,8 @@ public class FunababCameraPlugin extends GodotPlugin {
             Log.d(TAG, "initializeView: can only instantiate one view at a time!");
             return false;
         }
+		
+		final Camera.PreviewCallback previewCallback = this;
 
 	    mInstanceId = instanceId;
 	    mGodot.runOnUiThread(new Runnable() {
@@ -60,17 +62,33 @@ public class FunababCameraPlugin extends GodotPlugin {
                     Log.e(TAG, "failed to create camera preview: " + e.getMessage());
                     return;
                 }
-
+				
                 mGodotCameraView = godotCameraView;
                 mLayout.addView(mGodotCameraView);
+				godotCameraView.initializeLayout();
 
                 GodotLib.calldeferred(instanceId, "_set_camera_features_", new Object[]{
                         ParameterSerializer.serialize(mGodotCameraView.getCameraFeatures())
                 });
+				
+				Camera camera = godotCameraView.getCamera();
+				if (camera != null) {
+					camera.setOneShotPreviewCallback(previewCallback);
+				}
             }
         });
 	    return true;
     }
+	
+    @Override
+    public final void onPreviewFrame(byte[] data, Camera camera) {
+		mGodot.runOnUiThread(new Runnable() {
+			@Override
+				public void run() {
+					GodotLib.calldeferred(mInstanceId, "_on_camera_rendering_", new Object[] {});
+				}
+			});
+	}
 
     @Override
     public View onMainCreate(Activity activity) {
